@@ -1,49 +1,45 @@
 #include "Task.hpp"
+#include <chrono>
 #include <cstdlib>
+#include <iostream>
 #include <vector>
 #include <boost/regex.hpp>
 #include <boost/algorithm/string/regex.hpp>
 #include <boost/regex/v5/regex_fwd.hpp>
 
 Task::Task(std::string _info, int _dur,
-    int _stint, int _pause, std::string _head, std::string _com): duration(_dur), stint(_stint), header(_head), comment(_com)
+    int _stint, int _pause, std::string _head, std::string _com): header(_head), comment(_com)
 {
-  std::vector<std::string> elements;
-  _info.erase(std::remove(_info.begin(), _info.end(), '\n'), _info.end());
-  boost::split_regex(elements, _info, boost::regex(" "));
-  this->day = elements[0];
-  this->date = elements[1] + " " + elements[2] + " " + elements[4];
-  this->time = elements[3];
+  std::tm tm = {};
+  std::cout << _info << std::endl;
+  strptime(_info.c_str(), "%a %b %d %H:%M:%S %Y", &tm);
+  this->tp = std::chrono::system_clock::from_time_t(std::mktime(&tm));
+  this->dur = std::chrono::duration<int,std::ratio<60,1>>(_dur);
+  this->stint = std::chrono::duration<int,std::ratio<60,1>>(_stint);
+  this->pause = std::chrono::duration<int,std::ratio<60,1>>(_pause);
 }
 
-bool operator<(Task t1, Task t2){
-    auto od1 = t1.getOrdering();
-    auto od2 = t2.getOrdering();
-    if(od1.year < od2.year) return true;
-    if(od1.month < od2.month && od1.year == od2.year) return true;
-    if(od1.day < od2.day && od1.month == od2.month && od1.year == od2.year) return true;
-    if(od1.day == od2.day && od1.month == od2.month && od1.year == od2.year) return true;
-  return false;
+Task::Task(std::chrono::time_point<std::chrono::system_clock> _tp, int _dur,
+    int _stint, int _pause, std::string _head, std::string _com):tp(_tp), header(_head), comment(_com)
+{
+  this->dur = std::chrono::duration<int,std::ratio<60,1>>(_dur);
+  this->stint = std::chrono::duration<int,std::ratio<60,1>>(_stint);
+  this->pause = std::chrono::duration<int,std::ratio<60,1>>(_pause);
 }
 
-orderDate Task::getOrdering(){
-  orderDate od;
-  std::vector<std::string> vec;
-  boost::split_regex(vec, this->date, boost::regex(" "));
-  od.day = std::atoi(vec[1].c_str());
-  od.year = std::atoi(vec[2].c_str());
-  od.month = -1;
-    if (vec[0] == "Gen") od.month = 0;
-    else if(vec[0] == "Feb") od.month = 1;
-    else if(vec[0] == "Mar") od.month = 2;
-    else if(vec[0] == "Apr") od.month = 3;
-    else if(vec[0] == "May") od.month = 4;
-    else if(vec[0] == "Jun") od.month = 5;
-    else if(vec[0] == "Jul") od.month = 6;
-    else if(vec[0] == "Aug") od.month = 7;
-    else if(vec[0] == "Sep") od.month = 8;
-    else if(vec[0] == "Oct") od.month = 9;
-    else if(vec[0] == "Nov") od.month = 10;
-    else if(vec[0] == "Dec") od.month = 11;
-  return od;
-};
+inline bool operator < (Task t1, Task t2){
+    return (t1.tp < t2.tp);
+}
+
+std::ostream& operator << (std::ostream& os, const Task& t){
+  auto time = std::chrono::system_clock::to_time_t(t.tp);
+  os << std::ctime(&time) << std::endl;   
+  auto durtime = std::chrono::system_clock::to_time_t(t.tp + t.dur);
+  os << std::ctime(&durtime) << std::endl;   
+  auto stinttime = std::chrono::system_clock::to_time_t(t.tp + t.stint);
+  std::cout << std::ctime(&stinttime) << std::endl;   
+  auto stoptime = std::chrono::system_clock::to_time_t(t.tp + t.pause);
+  os << std::ctime(&stoptime) << std::endl;   
+  os << t.header << "\n" << t.comment << std::endl;
+  return os;
+}
