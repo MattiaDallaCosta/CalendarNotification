@@ -9,10 +9,7 @@ class Task
 {
 private:
   std::chrono::time_point<std::chrono::system_clock> tp;
-  std::string date;
-  std::string day;
-  std::string time;
-  std::chrono::duration<int,std::ratio<60,1>> dur, stint, pause;
+  std::chrono::minutes dur, stint, pause;
   std::string header;
   std::string comment;
 public:
@@ -25,6 +22,11 @@ public:
   ~Task() = default;
   friend bool operator<(Task, Task);
   friend std::ostream& operator << (std::ostream& os, const Task& t);
+  std::chrono::time_point<std::chrono::system_clock> _tp();
+  std::chrono::minutes _dur();
+  std::chrono::minutes _stint();
+  std::chrono::minutes _pause();
+  void setDur(std::chrono::minutes);
 };
 
 bool operator < (Task, Task);

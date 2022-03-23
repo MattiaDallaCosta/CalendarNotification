@@ -2,6 +2,7 @@
 #include <chrono>
 #include <cstdlib>
 #include <iostream>
+#include <string>
 #include <vector>
 #include <boost/regex.hpp>
 #include <boost/algorithm/string/regex.hpp>
@@ -11,20 +12,39 @@ Task::Task(std::string _info, int _dur,
     int _stint, int _pause, std::string _head, std::string _com): header(_head), comment(_com)
 {
   std::tm tm = {};
-  std::cout << _info << std::endl;
   strptime(_info.c_str(), "%a %b %d %H:%M:%S %Y", &tm);
   this->tp = std::chrono::system_clock::from_time_t(std::mktime(&tm));
-  this->dur = std::chrono::duration<int,std::ratio<60,1>>(_dur);
-  this->stint = std::chrono::duration<int,std::ratio<60,1>>(_stint);
-  this->pause = std::chrono::duration<int,std::ratio<60,1>>(_pause);
+  this->dur = std::chrono::minutes(_dur);
+  this->stint = std::chrono::minutes(_stint);
+  this->pause = std::chrono::minutes(_pause);
 }
 
 Task::Task(std::chrono::time_point<std::chrono::system_clock> _tp, int _dur,
-    int _stint, int _pause, std::string _head, std::string _com):tp(_tp), header(_head), comment(_com)
-{
-  this->dur = std::chrono::duration<int,std::ratio<60,1>>(_dur);
-  this->stint = std::chrono::duration<int,std::ratio<60,1>>(_stint);
-  this->pause = std::chrono::duration<int,std::ratio<60,1>>(_pause);
+    int _stint, int _pause, std::string _head, std::string _com):tp(_tp), header(_head),
+  comment(_com) {
+  this->dur = std::chrono::minutes(_dur);
+  this->stint = std::chrono::minutes(_stint);
+  this->pause = std::chrono::minutes(_pause);
+}
+
+inline std::chrono::time_point<std::chrono::system_clock> Task::_tp(){
+  return this->tp;
+}
+
+inline std::chrono::minutes Task::_dur() {
+  return this->dur;
+}
+
+inline std::chrono::minutes Task::_stint() {
+  return this->stint;
+}
+
+inline std::chrono::minutes Task::_pause() {
+  return this->pause;
+}
+
+inline void Task::setDur(std::chrono::minutes m) {
+  this->dur = m;
 }
 
 inline bool operator < (Task t1, Task t2){
@@ -33,13 +53,9 @@ inline bool operator < (Task t1, Task t2){
 
 std::ostream& operator << (std::ostream& os, const Task& t){
   auto time = std::chrono::system_clock::to_time_t(t.tp);
-  os << std::ctime(&time) << std::endl;   
-  auto durtime = std::chrono::system_clock::to_time_t(t.tp + t.dur);
-  os << std::ctime(&durtime) << std::endl;   
-  auto stinttime = std::chrono::system_clock::to_time_t(t.tp + t.stint);
-  std::cout << std::ctime(&stinttime) << std::endl;   
-  auto stoptime = std::chrono::system_clock::to_time_t(t.tp + t.pause);
-  os << std::ctime(&stoptime) << std::endl;   
-  os << t.header << "\n" << t.comment << std::endl;
+  std::string strTime = std::ctime(&time);
+  strTime[strTime.size() - 1] = '\0';
+  os << "time point: " << strTime << "\nduration time: " << t.dur.count() << " min\nstint time: " 
+     << t.stint.count() << " min\npause time: " << t.pause.count() << " min\nMessage: " << t.header << " -=- " << t.comment << std::endl;
   return os;
 }
