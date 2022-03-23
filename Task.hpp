@@ -4,14 +4,14 @@
 #include <memory>
 #include <ostream>
 #include <string>
+#include "Message.hpp"
 
 class Task
 {
 private:
   std::chrono::time_point<std::chrono::system_clock> tp;
   std::chrono::minutes dur, stint, pause;
-  std::string header;
-  std::string comment;
+  Message message;
 public:
   Task(std::string, int, int, int, std::string, std::string);
   Task(std::chrono::time_point<std::chrono::system_clock>, int, int, int, std::string, std::string);
@@ -27,6 +27,7 @@ public:
   std::chrono::minutes _stint();
   std::chrono::minutes _pause();
   void setDur(std::chrono::minutes);
+
 };
 
 bool operator < (Task, Task);

@@ -7,12 +7,6 @@
 #include <iostream>
 #include "Task.hpp"
 
-typedef enum {
-  NONE = 1,
-  STINT = 2,
-  PAUSE = 4
-} State;
-
 typedef struct {
   std::string array[6];
 } strTask;

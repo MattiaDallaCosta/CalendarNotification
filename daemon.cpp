@@ -8,6 +8,7 @@
 #include <chrono>
 #include <thread>
 
+#include "Message.hpp"
 #include "Task.hpp"
 #include "MyUtils.hpp"
 
@@ -27,34 +28,35 @@ int main (int argc, char ** argv)
   std::cout << std::endl;
 
   std::chrono::milliseconds sleepTime = std::chrono::duration_cast<std::chrono::milliseconds>(tasks.front()._tp() - now);
+  std::chrono::minutes appDur(0);
+
+  auto update = [&] (std::chrono::minutes upVal) {
+        sleepTime = std::chrono::duration_cast<std::chrono::milliseconds>(tasks.front()._dur() < upVal ? tasks.front()._dur() : upVal);
+        if(sleepTime == upVal){
+          state = state == STINT ? PAUSE : STINT;
+          tasks.front().setDur(tasks.front()._dur() - upVal);
+        }else {
+          state = NONE;
+          
+        }
+    };
 
   while(1){
   if (sleepTime > std::chrono::milliseconds(0)) std::this_thread::sleep_for(sleepTime);
   else {
     switch (state) {
       case(PAUSE):
-        sleepTime = std::chrono::duration_cast<std::chrono::milliseconds>(tasks.front()._dur() < tasks.front()._stint() ? tasks.front()._dur() : tasks.front()._stint());
-        if(sleepTime == tasks.front()._stint()){
-          state = STINT;
-          tasks.front().setDur(tasks.front()._dur() - tasks.front()._stint());
-        }else {
-          state = NONE;
-          tasks.pop_front();
-        }
+        update(tasks.front()._stint());
       break;
       case(STINT):
-        sleepTime = std::chrono::duration_cast<std::chrono::milliseconds>(tasks.front()._dur() < tasks.front()._stint() ? tasks.front()._dur() : tasks.front()._stint());
-        if(sleepTime == tasks.front()._stint()){
-          state = STINT;
-          tasks.front().setDur(tasks.front()._dur() - tasks.front()._stint());
-        }else {
-          state = NONE;
-          tasks.pop_front();
-        }
+        update(tasks.front()._pause());
       break;
       case(NONE):
+      Task lastTask(tasks.front());
+      tasks.pop_front();
         if(!tasks.empty()){
-
+          state = STINT;
+          sleepTime = std::chrono::duration_cast<std::chrono::milliseconds>(tasks.front()._tp() - (lastTask._tp() + lastTask._dur())); 
         } else return 1;
       break;
       }

@@ -4,12 +4,9 @@
 #include <iostream>
 #include <string>
 #include <vector>
-#include <boost/regex.hpp>
-#include <boost/algorithm/string/regex.hpp>
-#include <boost/regex/v5/regex_fwd.hpp>
 
 Task::Task(std::string _info, int _dur,
-    int _stint, int _pause, std::string _head, std::string _com): header(_head), comment(_com)
+    int _stint, int _pause, std::string _head, std::string _com): message{_head, _com, }
 {
   std::tm tm = {};
   strptime(_info.c_str(), "%a %b %d %H:%M:%S %Y", &tm);
@@ -20,8 +17,8 @@ Task::Task(std::string _info, int _dur,
 }
 
 Task::Task(std::chrono::time_point<std::chrono::system_clock> _tp, int _dur,
-    int _stint, int _pause, std::string _head, std::string _com):tp(_tp), header(_head),
-  comment(_com) {
+    int _stint, int _pause, std::string _head, std::string _com):tp(_tp), message{_head, _com}
+{
   this->dur = std::chrono::minutes(_dur);
   this->stint = std::chrono::minutes(_stint);
   this->pause = std::chrono::minutes(_pause);
@@ -56,6 +53,7 @@ std::ostream& operator << (std::ostream& os, const Task& t){
   std::string strTime = std::ctime(&time);
   strTime[strTime.size() - 1] = '\0';
   os << "time point: " << strTime << "\nduration time: " << t.dur.count() << " min\nstint time: " 
-     << t.stint.count() << " min\npause time: " << t.pause.count() << " min\nMessage: " << t.header << " -=- " << t.comment << std::endl;
+     << t.stint.count() << " min\npause time: " << t.pause.count() << " min\nMessage: " << t.message.header << " -=- " << t.message.comment << std::endl;
   return os;
 }
+
