@@ -1,4 +1,5 @@
 #include "MyUtils.hpp"
+#include <chrono>
 #include <string>
 
 void readConfig(std::list<Task> &list, std::string _file) {
@@ -13,7 +14,15 @@ void readConfig(std::list<Task> &list, std::string _file) {
   }
   do {
     if (c == '\n' || c == '\0') {
-      list.insert(list.end(), Task(app.array[0], std::atoi(app.array[1].c_str()), std::atoi(app.array[2].c_str()), std::atoi(app.array[3].c_str()), app.array[4], app.array[5]));
+      Task created(app.array[0], std::atoi(app.array[1].c_str()), std::atoi(app.array[2].c_str()), std::atoi(app.array[3].c_str()), app.array[4], app.array[5]);
+      auto now = std::chrono::system_clock::now();
+      if(now > (created._tp() + created._dur()));
+      else {
+        if(now > created._tp()){
+          created.setTp(now);
+        }
+        list.insert(list.end(), created);
+      }
       count = 0;
       for(auto &s:app.array){
         s = "";
@@ -27,3 +36,5 @@ void readConfig(std::list<Task> &list, std::string _file) {
   }while (read(fd, &c, 1) > 0);
   list.pop_front();
 }
+
+

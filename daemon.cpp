@@ -7,6 +7,7 @@
 #include <list>
 #include <chrono>
 #include <thread>
+#include <unistd.h>
 
 #include "Message.hpp"
 #include "Task.hpp"
@@ -18,6 +19,7 @@ State state = NONE;
 int main (int argc, char ** argv)
 {
   auto now = std::chrono::system_clock::now();
+  Task start(now,0,0,0,"", "");
   std::list<Task> tasks;
 
   readConfig(tasks, file);
@@ -28,16 +30,19 @@ int main (int argc, char ** argv)
   std::cout << std::endl;
 
   std::chrono::milliseconds sleepTime = std::chrono::duration_cast<std::chrono::milliseconds>(tasks.front()._tp() - now);
-  std::chrono::minutes appDur(0);
-
+  std::chrono::minutes appDur = tasks.front()._dur();
+  std::cout << start;
   auto update = [&] (std::chrono::minutes upVal) {
-        sleepTime = std::chrono::duration_cast<std::chrono::milliseconds>(tasks.front()._dur() < upVal ? tasks.front()._dur() : upVal);
+        sleepTime = std::chrono::duration_cast<std::chrono::milliseconds>(appDur < upVal ? appDur : upVal);
         if(sleepTime == upVal){
-          state = state == STINT ? PAUSE : STINT;
-          tasks.front().setDur(tasks.front()._dur() - upVal);
+          tasks.front().setState(state == STINT ? PAUSE : STINT);
+          std::cout << "bella" << std::endl;
+          appDur = appDur - upVal;
+          if((fork() == 0)){
+            //exec
+          }
         }else {
           state = NONE;
-          
         }
     };
 
@@ -56,6 +61,7 @@ int main (int argc, char ** argv)
       tasks.pop_front();
         if(!tasks.empty()){
           state = STINT;
+          appDur = tasks.front()._dur();
           sleepTime = std::chrono::duration_cast<std::chrono::milliseconds>(tasks.front()._tp() - (lastTask._tp() + lastTask._dur())); 
         } else return 1;
       break;

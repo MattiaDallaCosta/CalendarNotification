@@ -27,6 +27,8 @@ public:
   std::chrono::minutes _stint();
   std::chrono::minutes _pause();
   void setDur(std::chrono::minutes);
+  void setState(State);
+  void setTp(std::chrono::time_point<std::chrono::system_clock>);
 
 };
 

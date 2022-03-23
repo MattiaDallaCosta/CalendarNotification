@@ -24,27 +24,35 @@ Task::Task(std::chrono::time_point<std::chrono::system_clock> _tp, int _dur,
   this->pause = std::chrono::minutes(_pause);
 }
 
-inline std::chrono::time_point<std::chrono::system_clock> Task::_tp(){
+std::chrono::time_point<std::chrono::system_clock> Task::_tp(){
   return this->tp;
 }
 
-inline std::chrono::minutes Task::_dur() {
+std::chrono::minutes Task::_dur() {
   return this->dur;
 }
 
-inline std::chrono::minutes Task::_stint() {
+std::chrono::minutes Task::_stint() {
   return this->stint;
 }
 
-inline std::chrono::minutes Task::_pause() {
+std::chrono::minutes Task::_pause() {
   return this->pause;
 }
 
-inline void Task::setDur(std::chrono::minutes m) {
+void Task::setDur(std::chrono::minutes m) {
   this->dur = m;
 }
 
-inline bool operator < (Task t1, Task t2){
+void Task::setState(State s) {
+  this->message.state = s;
+}
+
+void Task::setTp(std::chrono::time_point<std::chrono::system_clock> _tp){
+  this->tp = _tp;
+}
+
+bool operator < (Task t1, Task t2){
     return (t1.tp < t2.tp);
 }
 
