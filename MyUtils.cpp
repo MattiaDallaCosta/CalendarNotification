@@ -19,6 +19,7 @@ void readConfig(std::list<Task> &list, std::string _file) {
       if(now > (created._tp() + created._dur()));
       else {
         if(now > created._tp()){
+          created.setDur(std::chrono::duration_cast<std::chrono::minutes>((now - created._tp() + created._dur())));
           created.setTp(now);
         }
         list.insert(list.end(), created);
@@ -34,7 +35,6 @@ void readConfig(std::list<Task> &list, std::string _file) {
       } else app.array[count - 4 < 0 ? 0 : count - 4].push_back(c);
     }
   }while (read(fd, &c, 1) > 0);
-  list.pop_front();
 }
 
 
