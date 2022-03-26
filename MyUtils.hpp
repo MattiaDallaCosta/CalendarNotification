@@ -8,7 +8,9 @@
 #include "Task.hpp"
 
 typedef struct {
-  std::string array[6];
+  std::string array[5];
 } strTask;
 
 void readConfig(std::list<Task>&, std::string);
+std::string strToHeader(std::string);
+std::string strToComment(std::string);

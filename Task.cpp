@@ -8,7 +8,7 @@
 Task::Task(std::string _info, int _dur,
     int _stint, int _pause, std::string _head, std::string _com): message{_head, _com, NONE} {
   std::tm tm = {};
-  strptime(_info.c_str(), "%a %b %d %H:%M:%S %Y", &tm);
+  strptime(_info.c_str(), "%b %d %Y %H:%M", &tm);
   this->tp = std::chrono::system_clock::from_time_t(std::mktime(&tm));
   this->dur = std::chrono::minutes(_dur);
   this->stint = std::chrono::minutes(_stint);

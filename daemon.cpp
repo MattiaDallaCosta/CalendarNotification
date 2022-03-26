@@ -33,6 +33,7 @@ int main (int argc, char ** argv)
   Task start(now,0,0,0,"", "");
   std::cout << start << std::endl;
   std::list<Task> tasks;
+  std::cout << "pre read\n";
   readConfig(tasks, file);
   for (auto t : tasks) std::cout << t << std::endl;
   
@@ -66,7 +67,7 @@ int main (int argc, char ** argv)
       Message appm = tasks.front()._message();
       msg app;
       app.msg(appm, 1);
-      msgsnd(qId, &app, sizeof(Message), 0);
+      msgsnd(qId, &app, msgSIZE, 0);
     }
     usleep(std::chrono::duration_cast<std::chrono::microseconds>(sleepTime).count());
     while(wait(NULL) > 0);
