@@ -4,17 +4,27 @@
 #include <memory>
 #include <ostream>
 #include <string>
+#include <iomanip>
 #include "Message.hpp"
+
+typedef enum {
+  NEVER = 0,
+  DAILY = 1,
+  MONTHLY = 2,
+  YEARLY = 3
+} Cadence;
 
 class Task
 {
 private:
   std::chrono::time_point<std::chrono::system_clock> tp;
   std::chrono::seconds dur, stint, pause;
+  Cadence cadence;
   Message message;
 public:
-  Task(std::string, int, int, int, std::string, std::string);
-  Task(std::chrono::time_point<std::chrono::system_clock>, int, int, int, std::string, std::string);
+  Task(std::string, int, int, int, int, std::string, std::string);
+  Task(std::chrono::time_point<std::chrono::system_clock>, int, int, int, int, std::string, std::string);
+  Task(std::string, int, int, int);
   Task(Task &&) = default;
   Task(const Task &);
   Task &operator=(Task &&) = default;

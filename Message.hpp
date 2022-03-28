@@ -1,12 +1,14 @@
 #pragma once
 #include <iostream>
+#include <map>
+#include <string>
 
 #define msgSIZE 1024
 
 typedef enum {
-  NONE = 1,
-  STINT = 2,
-  PAUSE = 4
+  NONE = 0,
+  STINT = 1,
+  PAUSE = 2
 } State;
 
 typedef struct message{
@@ -21,4 +23,6 @@ typedef struct {
   char message[msgSIZE];
   void msg(Message &, long);
   Message getMessage(void);
+  std::string getOp();
+  void Op(std::string, long);
 } msg;

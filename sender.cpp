@@ -11,7 +11,7 @@
 #include <unistd.h>
 #include "Message.hpp"
 
-void sendNotification(std::string, std::string, int);
+void sendNotification(std::string, std::string, State, int);
 
 int main (int argc, char ** argv)
 {
@@ -26,17 +26,18 @@ int main (int argc, char ** argv)
   msgrcv(qId, &m, msgSIZE, 1, 0);
   Message mess = m.getMessage();
   notify_init("Sample");
-  sendNotification(mess.header, mess.comment, 4000);
+  sendNotification(mess.header, mess.comment, mess.state, 4000);
+  std::cout << "header: " << mess.header << "\ncomment: " << mess.comment << "\nstate: " << mess.state << std::endl;
   notify_uninit();
   exit(0);
   return 0;
 }
 
-void sendNotification(std::string _sum, std::string _text, int _timeout){
+void sendNotification(std::string _sum, std::string _text, State _state, int _timeout){
   if(!notify_is_initted()) notify_init("Sample");
   NotifyNotification * n = notify_notification_new(_sum.c_str(), _text.c_str(), 0);
+  notify_notification_set_urgency(n,_state == 1 ? NOTIFY_URGENCY_NORMAL : NOTIFY_URGENCY_CRITICAL);
   notify_notification_set_timeout(n, _timeout);
   int flag = notify_notification_show(n, 0);
-  std::fprintf(flag ? stdout : stderr, "%s", flag ? "sent\n" : "not sent\n");
-  if (!flag) sendNotification(_sum, _text, _timeout);
+  std::fprintf(stdout, "%s", flag ? "sent\n" : "not sent\n");
 }
